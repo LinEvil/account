@@ -42,9 +42,11 @@ public class Executor implements Listener {
 	private ExecutorService pool;
 	private EbeanHandler source;
 	
+	private final Object object = new Object();
+	
 	@EventHandler
 	public void handle(PlayerLoginEvent event) {
-		getStateMap().put(event.getPlayer().getName(), State.WAIT_CHECK);
+		getStateMap().put(event.getPlayer().getName(), object);
 	}
 	
 	@EventHandler
@@ -55,9 +57,7 @@ public class Executor implements Listener {
 					.where()
 					.eq("username", userName)
 					.findUnique();
-			
 			getUserMap().put(userName, a(user));
-			getStateMap().put(userName, State.WAIT_LOGIN);
 		});
 		getTask().runTaskLater(getMain(), () -> {
 			if (a(userName)) {
@@ -185,7 +185,7 @@ public class Executor implements Listener {
 		this.source = source;
 	}
 
-	public Map<String, State> getStateMap() {
+	public Map<String, Object> getStateMap() {
 		return stateMap;
 	}
 
