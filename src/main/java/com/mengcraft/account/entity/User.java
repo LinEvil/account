@@ -22,6 +22,9 @@ public class User {
 	
 	@Column
 	private String salt;
+	
+	@Column
+	private String regip;
 
 	public int getUid() {
 		return uid;
@@ -70,6 +73,14 @@ public class User {
 	 */
 	public boolean valid() {
 		return getUid() != 0;
+	}
+
+	public String getRegip() {
+		return regip;
+	}
+
+	public void setRegip(String regip) {
+		this.regip = regip;
 	}
 
 }

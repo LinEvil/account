@@ -1,5 +1,6 @@
 package com.mengcraft.account;
 
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -203,7 +204,7 @@ public class Executor implements Listener {
 			User user = getUserMap().get(name);
 			String secure = vector.next();
 			if (user != null && !user.valid() && secure.equals(vector.next())) {
-				a(user, name, secure);
+				a(user, name, secure, a.getAddress().getAddress());
 				a.sendMessage(ChatColor.GREEN + "注册成功");
 			} else {
 				a.sendMessage(ChatColor.DARK_RED + "注册失败");
@@ -223,7 +224,7 @@ public class Executor implements Listener {
 		}
 	}
 
-	private void a(User user, String name, String secure) {
+	private void a(User user, String name, String secure, InetAddress ip) {
 		SecureUtil util = SecureUtil.DEFAULT;
 		String salt = util.random(3);
 		try {
@@ -233,6 +234,7 @@ public class Executor implements Listener {
 		}
 		user.setSalt(salt);
 		user.setUsername(name);
+		user.setRegip(ip.getHostAddress());
 		getPool().execute(() -> {
 			getSource().save(user);
 		});
