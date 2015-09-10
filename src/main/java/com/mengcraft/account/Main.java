@@ -22,9 +22,6 @@ public class Main extends JavaPlugin {
 				throw new RuntimeException(e);
 			}
 		}
-		handler.install();
-		handler.reflect();
-		
 		new Executor().bind(this, handler);
 	}
 	
