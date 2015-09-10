@@ -14,7 +14,7 @@ public class User {
 	@Id
 	private int uid;
 	
-	@Column
+	@Column(unique = true)
 	private String username;
 	
 	@Column
