@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mengcraft.account.entity.User;
-import com.mengcraft.account.entity.lib.Metrics;
+import com.mengcraft.account.entity.lib.MetricsLite;
 import com.mengcraft.simpleorm.EbeanHandler;
 import com.mengcraft.simpleorm.EbeanManager;
 
@@ -24,7 +24,7 @@ public class Main extends JavaPlugin {
 				throw new RuntimeException(e);
 			}
 		}
-		new Metrics(this).start();
+		new MetricsLite(this).start();
 		new Executor().bind(this, handler);
 		
 		String[] strings = {
