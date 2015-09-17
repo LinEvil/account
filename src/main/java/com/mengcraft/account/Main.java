@@ -24,8 +24,9 @@ public class Main extends JavaPlugin {
 				throw new RuntimeException(e);
 			}
 		}
+		
+		new Executor().bind(this, handler, Account.DEFAULT.getUserMap());
 		new MetricsLite(this).start();
-		new Executor().bind(this, handler);
 		
 		String[] strings = {
                 ChatColor.GREEN + "梦梦家高性能服务器出租店",

@@ -36,15 +36,29 @@ import com.mengcraft.simpleorm.EbeanHandler;
 
 public class Executor implements Listener {
 
-	private Map stateMap = new ConcurrentHashMap();
-	private Map userMap = new ConcurrentHashMap();
+	private final Map stateMap = new ConcurrentHashMap();
+	private final Object object = new Object();
+	
+	private Map userMap;
 	
 	private Main main;
 	private ExecutorService pool;
 	private EbeanHandler source;
 	
-	private final Object object = new Object();
-	
+	public void bind(Main main, EbeanHandler source, Map userMap) {
+		if (getMain() != main) {
+			setMain(main);
+			getMain().getServer()
+					 .getPluginManager()
+				     .registerEvents(this, main);
+			setPool(new ThreadPoolExecutor(1, 4,
+					60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
+			);
+			setSource(source);
+			setUserMap(userMap);
+		}
+	}
+
 	@EventHandler
 	public void handle(PlayerLoginEvent event) {
 		getStateMap().put(event.getPlayer().getName(), object);
@@ -149,19 +163,6 @@ public class Executor implements Listener {
 		}
 	}
 
-	public void bind(Main main, EbeanHandler source) {
-		if (getMain() != main) {
-			setMain(main);
-			getMain().getServer()
-					 .getPluginManager()
-				     .registerEvents(this, main);
-			setPool(new ThreadPoolExecutor(1, 4,
-					60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
-			);
-			setSource(source);
-		}
-	}
-
 	public Main getMain() {
 		return main;
 	}
@@ -255,6 +256,10 @@ public class Executor implements Listener {
 
 	private User a(User user) {
 		return user != null ? user : getSource().bean(User.class);
+	}
+
+	private void setUserMap(Map userMap) {
+		this.userMap = userMap;
 	}
 
 }
