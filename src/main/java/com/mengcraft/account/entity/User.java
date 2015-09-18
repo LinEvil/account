@@ -23,7 +23,7 @@ public class User {
 	@Column
 	private String salt;
 	
-	@Column
+	@Column(length = 15)
 	private String regip;
 
 	public int getUid() {

@@ -1,0 +1,7 @@
+broadcast:
+  interval: 5
+  content:
+  -
+  -
+  -
+coreMode: false

@@ -1,12 +1,10 @@
 package com.mengcraft.account;
 
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,11 +19,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.mengcraft.account.entity.User;
@@ -34,52 +30,51 @@ import com.mengcraft.account.entity.lib.SecureUtil;
 import com.mengcraft.account.entity.lib.StringUtil;
 import com.mengcraft.simpleorm.EbeanHandler;
 
-public class Executor implements Listener {
+public class Executor implements Listener, Runnable {
 
 	private final Map stateMap = new ConcurrentHashMap();
 	private final Object object = new Object();
 	
-	private Map userMap;
+	private final Map userMap = Account.DEFAULT.getUserMap();
+	private final ExecutorService pool = Account.DEFAULT.getPool();
 	
 	private Main main;
-	private ExecutorService pool;
 	private EbeanHandler source;
 	
-	public void bind(Main main, EbeanHandler source, Map userMap) {
+	private String[] contents;
+	
+	public void bind(Main main, EbeanHandler source) {
 		if (getMain() != main) {
+			setContents(main.getConfig().getStringList("broadcast.content"));
 			setMain(main);
 			getMain().getServer()
 					 .getPluginManager()
 				     .registerEvents(this, main);
-			setPool(new ThreadPoolExecutor(1, 4,
-					60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>())
-			);
+			getMain().getServer()
+			         .getScheduler()
+			         .runTaskTimer(main, this, 600, 20 * main
+			         .getConfig().getInt("broadcast.interval"));
 			setSource(source);
-			setUserMap(userMap);
+		}
+	}
+	
+	@Override
+	public void run() {
+		for (Player p : getMain().getServer().getOnlinePlayers()) {
+			if (a(p.getName())) p.sendMessage(contents);
 		}
 	}
 
 	@EventHandler
 	public void handle(PlayerLoginEvent event) {
-		getStateMap().put(event.getPlayer().getName(), object);
-	}
-	
-	@EventHandler
-	public void handle(PlayerJoinEvent event) {
-		String userName = event.getPlayer().getName();
-		getPool().execute(() -> {
-			User user = getSource().find(User.class)
-					.where()
-					.eq("username", userName)
-					.findUnique();
-			getUserMap().put(userName, a(user));
-		});
+		Player player = event.getPlayer();
+		String userName = player.getName();
+		getStateMap().put(userName, object);
 		getTask().runTaskLater(getMain(), () -> {
-			if (a(userName)) {
+			if (player != null && player.isOnline() && a(userName)) {
 				event.getPlayer().kickPlayer(ChatColor.DARK_RED + "未登录");
 			}
 		}, 600);
-		event.getPlayer().sendMessage(ChatColor.GREEN + "请注册或登录/w\\");
 	}
 	
 	@EventHandler
@@ -136,11 +131,6 @@ public class Executor implements Listener {
 	}
 	
 	@EventHandler
-	public void handle(PlayerQuitEvent event) {
-		getUserMap().remove(event.getPlayer().getName());
-	}
-	
-	@EventHandler
 	public void handle(AsyncPlayerChatEvent event) {
 		if (a(event.getPlayer().getName())) {
 			event.setCancelled(true);
@@ -173,10 +163,6 @@ public class Executor implements Listener {
 
 	public ExecutorService getPool() {
 		return pool;
-	}
-
-	public void setPool(ExecutorService pool) {
-		this.pool = pool;
 	}
 
 	public EbeanHandler getSource() {
@@ -254,12 +240,8 @@ public class Executor implements Listener {
 		return getStateMap().get(name) != null;
 	}
 
-	private User a(User user) {
-		return user != null ? user : getSource().bean(User.class);
-	}
-
-	private void setUserMap(Map userMap) {
-		this.userMap = userMap;
+	private void setContents(List<String> list) {
+		contents = list.toArray(new String[] {});
 	}
 
 }
