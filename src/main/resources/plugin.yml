@@ -1,6 +1,6 @@
 name: Account
 main: com.mengcraft.account.Main
-version: 0.2.1
+version: 0.2.2
 author: mengcraft.com
 
 depend: [SimpleORM]

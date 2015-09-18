@@ -16,6 +16,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -62,6 +64,17 @@ public class Executor implements Listener, Runnable {
 	public void run() {
 		for (Player p : getMain().getServer().getOnlinePlayers()) {
 			if (a(p.getName())) p.sendMessage(contents);
+		}
+	}
+	
+	@EventHandler
+	public void handle(AsyncPlayerPreLoginEvent event) {
+		if (event.getName().length() > 15) {
+			event.setLoginResult(Result.KICK_OTHER);
+			event.setKickMessage("用户名长度不能大于15位");
+		} else if (!event.getName().matches("[\\w]+")) {
+			event.setLoginResult(Result.KICK_OTHER);
+			event.setKickMessage("用户名只能包含英文数字下划线");
 		}
 	}
 

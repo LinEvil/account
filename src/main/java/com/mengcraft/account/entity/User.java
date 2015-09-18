@@ -14,13 +14,13 @@ public class User {
 	@Id
 	private int uid;
 	
-	@Column(unique = true)
+	@Column(length = 15, unique = true)
 	private String username;
 	
-	@Column
+	@Column(length = 32)
 	private String password;
 	
-	@Column
+	@Column(length = 6)
 	private String salt;
 	
 	@Column(length = 15)
