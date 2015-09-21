@@ -235,10 +235,15 @@ public class Executor implements Listener, Runnable {
 		user.setSalt(salt);
 		user.setUsername(name);
 		user.setRegip(ip.getHostAddress());
+		user.setRegdate(nowSec());
 		getPool().execute(() -> {
 			getSource().save(user);
 		});
 		getStateMap().remove(name);
+	}
+
+	private int nowSec() {
+		return Long.class.cast(System.currentTimeMillis() / 1000).intValue();
 	}
 
 	private boolean a(Entity entity) {

@@ -12,7 +12,7 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		getConfig().options().copyDefaults();
+		getConfig().options().copyDefaults(true);
 		saveConfig();
 
 		EbeanHandler source = EbeanManager.DEFAULT.getHandler(this);
@@ -24,6 +24,7 @@ public class Main extends JavaPlugin {
 				throw new RuntimeException(e);
 			}
 		}
+		source.install();
 
 		new ExecutorCore().bind(this, source);
 		if (!getConfig().getBoolean("coreMode")) {

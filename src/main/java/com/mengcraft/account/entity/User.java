@@ -25,6 +25,18 @@ public class User {
 	
 	@Column(length = 15)
 	private String regip;
+	
+	@Column
+	private int regdate;
+	
+	@Column
+	private int lastloginip;
+	
+	@Column
+	private int lastlogintime;
+	
+	@Column(length = 8)
+	private String secques;
 
 	public int getUid() {
 		return uid;
@@ -81,6 +93,38 @@ public class User {
 
 	public void setRegip(String regip) {
 		this.regip = regip;
+	}
+
+	public int getRegdate() {
+		return regdate;
+	}
+
+	public void setRegdate(int regdate) {
+		this.regdate = regdate;
+	}
+
+	public int getLastloginip() {
+		return lastloginip;
+	}
+
+	public void setLastloginip(int lastloginip) {
+		this.lastloginip = lastloginip;
+	}
+
+	public int getLastlogintime() {
+		return lastlogintime;
+	}
+
+	public void setLastlogintime(int lastlogintime) {
+		this.lastlogintime = lastlogintime;
+	}
+
+	public String getSecques() {
+		return secques;
+	}
+
+	public void setSecques(String secques) {
+		this.secques = secques;
 	}
 
 }
