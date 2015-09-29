@@ -147,16 +147,16 @@ public class MetricsLite {
      *
      * @return True if statistics measuring is running, otherwise false.
      */
-    public boolean start() {
+    public void start() {
         synchronized (optOutLock) {
             // Did we opt out?
             if (isOptOut()) {
-                return false;
+                return;
             }
 
             // Is metrics already running?
             if (task != null) {
-                return true;
+                return;
             }
 
             // Begin hitting the server with glorious data
@@ -191,7 +191,7 @@ public class MetricsLite {
                 }
             }, 0, PING_INTERVAL * 1200);
 
-            return true;
+            return;
         }
     }
 
@@ -200,7 +200,7 @@ public class MetricsLite {
      *
      * @return true if metrics should be opted out of it
      */
-    public boolean isOptOut() {
+    private boolean isOptOut() {
         synchronized (optOutLock) {
             try {
                 // Reload the metrics file
@@ -268,7 +268,7 @@ public class MetricsLite {
      *
      * @return the File object for the config file
      */
-    public File getConfigFile() {
+    private File getConfigFile() {
         // I believe the easiest way to get the base folder (e.g craftbukkit set via -P) for plugins to use
         // is to abuse the plugin object we already have
         // plugin.getDataFolder() => base/plugins/PluginA/
@@ -415,7 +415,7 @@ public class MetricsLite {
      * @param input
      * @return
      */
-    public static byte[] gzip(String input) {
+    private static byte[] gzip(String input) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         GZIPOutputStream gzos = null;
 
@@ -456,7 +456,7 @@ public class MetricsLite {
      * @param value
      * @throws UnsupportedEncodingException
      */
-    private static void appendJSONPair(StringBuilder json, String key, String value) throws UnsupportedEncodingException {
+    private static void appendJSONPair(StringBuilder json, String key, String value) {
         boolean isValueNumeric = false;
 
         try {
@@ -516,7 +516,7 @@ public class MetricsLite {
                 default:
                     if (chr < ' ') {
                         String t = "000" + Integer.toHexString(chr);
-                        builder.append("\\u" + t.substring(t.length() - 4));
+                        builder.append("\\u").append(t.substring(t.length() - 4));
                     } else {
                         builder.append(chr);
                     }

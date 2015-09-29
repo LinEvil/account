@@ -9,10 +9,7 @@ public class ArrayVector<E> implements Iterator<E> {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ArrayVector) {
-            return toString().equals(obj.toString());
-        }
-        return false;
+        return obj instanceof ArrayVector && toString().equals(obj.toString());
     }
 
     @Override

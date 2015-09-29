@@ -3,7 +3,7 @@ package com.mengcraft.account.entity.lib;
 public class StringUtil {
 
     public static final StringUtil DEF = new StringUtil();
-    public static final char CHAR_SPLIT = 32;
+    private static final char CHAR_SPLIT = 32;
 
     public String format(String in, Object... res) {
         StringBuilder builder = new StringBuilder();
@@ -26,9 +26,9 @@ public class StringUtil {
         return builder.toString();
     }
 
-    public String[] split(String in, char c) {
+    private String[] split(String in, char c) {
         ArrayBuilder<String> ab = new ArrayBuilder<>();
-        int x = 0, y = x;
+        int x = 0, y;
         for (; (y = in.indexOf(c, x)) != -1;x = y + 1) {
             ab.append(in.substring(x, y));
         }

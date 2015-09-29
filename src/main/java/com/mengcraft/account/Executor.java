@@ -84,7 +84,7 @@ public class Executor implements Listener, Runnable {
 		String userName = player.getName();
 		getStateMap().put(userName, object);
 		getTask().runTaskLater(getMain(), () -> {
-			if (player != null && player.isOnline() && a(userName)) {
+			if (player.isOnline() && a(userName)) {
 				event.getPlayer().kickPlayer(ChatColor.DARK_RED + "未登录");
 			}
 		}, 600);
@@ -166,31 +166,31 @@ public class Executor implements Listener, Runnable {
 		}
 	}
 
-	public Main getMain() {
+	private Main getMain() {
 		return main;
 	}
 
-	public void setMain(Main main) {
+	private void setMain(Main main) {
 		this.main = main;
 	}
 
-	public ExecutorService getPool() {
+	private ExecutorService getPool() {
 		return pool;
 	}
 
-	public EbeanHandler getSource() {
+	private EbeanHandler getSource() {
 		return source;
 	}
 
-	public void setSource(EbeanHandler source) {
+	private void setSource(EbeanHandler source) {
 		this.source = source;
 	}
 
-	public Map<String, Object> getStateMap() {
+	private Map<String, Object> getStateMap() {
 		return stateMap;
 	}
 
-	public Map<String, User> getUserMap() {
+	private Map<String, User> getUserMap() {
 		return userMap;
 	}
 
@@ -247,7 +247,7 @@ public class Executor implements Listener, Runnable {
 	}
 
 	private boolean a(Entity entity) {
-		return entity instanceof Player ? a(b(entity)) : false;
+		return entity instanceof Player && a(b(entity));
 	}
 
 	private String b(Entity entity) {
@@ -259,7 +259,7 @@ public class Executor implements Listener, Runnable {
 	}
 
 	private void setContents(List<String> list) {
-		contents = list.toArray(new String[] {});
+		contents = list.toArray(new String[list.size()]);
 	}
 
 }

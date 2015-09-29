@@ -21,7 +21,7 @@ public final class SecureUtil {
 		return digest(in.getBytes());
 	}
 
-	public String digest(byte[] in) throws Exception {
+	private String digest(byte[] in) throws Exception {
 		if (in == null) {
 			throw new NullPointerException();
 		}
@@ -43,7 +43,7 @@ public final class SecureUtil {
 		return hex(input);
 	}
 
-	public String hex(byte[] out) {
+	private String hex(byte[] out) {
 		if (out == null) {
 			throw new NullPointerException();
 		}

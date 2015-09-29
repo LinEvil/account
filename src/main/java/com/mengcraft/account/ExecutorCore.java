@@ -46,19 +46,19 @@ public class ExecutorCore implements Listener {
 		return user != null ? user : getSource().bean(User.class);
 	}
 
-	public ExecutorService getPool() {
+	private ExecutorService getPool() {
 		return pool;
 	}
 
-	public Map getUserMap() {
+	private Map getUserMap() {
 		return userMap;
 	}
 
-	public EbeanHandler getSource() {
+	private EbeanHandler getSource() {
 		return source;
 	}
 
-	public void setSource(EbeanHandler source) {
+	private void setSource(EbeanHandler source) {
 		this.source = source;
 	}
 

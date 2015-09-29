@@ -35,9 +35,8 @@ public class ArrayBuilder<T> {
         if (input.length < cursor) {
             throw new IndexOutOfBoundsException();
         }
-        Object[] output = input;
         while (cursor != 0) {
-            output[--cursor] = array[cursor];
+            input[--cursor] = ((T) array[cursor]);
         }
         return input;
     }
