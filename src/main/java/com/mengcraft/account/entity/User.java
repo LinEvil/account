@@ -35,7 +35,7 @@ public class User {
 	@Column
 	private int lastlogintime;
 	
-	@Column(length = 8)
+	@Column(length = 8, nullable = false)
 	private String secques;
 
 	public int getUid() {
