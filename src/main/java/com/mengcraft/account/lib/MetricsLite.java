@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.mengcraft.account.entity.lib;
+package com.mengcraft.account.lib;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -132,8 +132,8 @@ public class MetricsLite {
             configuration.options().header("http://mcstats.org").copyDefaults(true);
             configuration.save(configurationFile);
         } catch (Exception e) {
-			// TODO: handle exception
-		}
+            // TODO: handle exception
+        }
 
         // Load the guid then
         guid = configuration.getString("guid");
@@ -190,8 +190,6 @@ public class MetricsLite {
                     }
                 }
             }, 0, PING_INTERVAL * 1200);
-
-            return;
         }
     }
 
@@ -279,26 +277,26 @@ public class MetricsLite {
         // return => base/plugins/PluginMetrics/config.yml
         return new File(new File(pluginsFolder, "PluginMetrics"), "config.yml");
     }
-    
+
     /**
      * Gets the online player (backwards compatibility)
-     * 
+     *
      * @return online player amount
      */
     private int getOnlinePlayers() {
         try {
             Method onlinePlayerMethod = Server.class.getMethod("getOnlinePlayers");
-            if(onlinePlayerMethod.getReturnType().equals(Collection.class)) {
-                return ((Collection<?>)onlinePlayerMethod.invoke(Bukkit.getServer())).size();
+            if (onlinePlayerMethod.getReturnType().equals(Collection.class)) {
+                return ((Collection<?>) onlinePlayerMethod.invoke(Bukkit.getServer())).size();
             } else {
-                return ((Player[])onlinePlayerMethod.invoke(Bukkit.getServer())).length;
+                return ((Player[]) onlinePlayerMethod.invoke(Bukkit.getServer())).length;
             }
         } catch (Exception ex) {
             if (debug) {
                 Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
             }
         }
-        
+
         return 0;
     }
 

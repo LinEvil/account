@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.mengcraft.account.entity.lib.SecureUtil;
+import com.mengcraft.account.lib.SecureUtil;
 
 @Entity
 @Table(name = "pre_ucenter_members")
