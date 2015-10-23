@@ -29,6 +29,11 @@
 图样，说了关联dz论坛阿。
 
 ## Session
+### Structure
+- X as int value
+- Y as int value
+- Z as int value
+
 ### Protocol
 Id | Description       | Format
 ---|-------------------|---------------

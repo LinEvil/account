@@ -36,7 +36,7 @@ public class Main extends JavaPlugin {
         if (getConfig().getBoolean("coreMode")) {
             getLogger().info("Entering core mode! Will not handle any auth method!");
         } else if (getConfig().getBoolean("sessionMode.enable")) {
-            SessionExecutor executor = new SessionExecutor();
+            SessionExecutor executor = new SessionExecutor(this, source);
             getServer().getMessenger().registerIncomingPluginChannel(this, "Account", executor);
             getServer().getPluginManager().registerEvents(executor, this);
             try {
@@ -54,6 +54,10 @@ public class Main extends JavaPlugin {
                 ChatColor.GREEN + "shop105595113.taobao.com"
         };
         getServer().getConsoleSender().sendMessage(strings);
+    }
+
+    public void sync(Runnable runnable) {
+        getServer().getScheduler().runTask(this, runnable);
     }
 
 }

@@ -81,6 +81,7 @@ public class Event {
         event.player = player.getName();
         event.ip = player.getAddress().getAddress().getHostAddress();
         event.type = type;
+
         return event;
     }
 

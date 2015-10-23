@@ -41,7 +41,7 @@ public class SessionClient {
             if (length != 0 && client.buffer.remaining() != 0) {
                 client.client.write(client.buffer, 15, TimeUnit.SECONDS, client, WRITE_HANDLER);
             } else {
-                client.close();
+                client.close("Close due to response done!");
             }
         }
 
@@ -167,10 +167,6 @@ public class SessionClient {
         } catch (IOException e) {
             main.getLogger().info("[SessionServer] Error when close handle! " + e.getMessage());
         }
-    }
-
-    private void close() {
-        close("Try close a completed connection!");
     }
 
 }

@@ -25,11 +25,11 @@ public class Account {
 				    new LinkedBlockingQueue<>());
 	}
 
-	Map<String, User> getUserMap() {
+	public Map<String, User> getUserMap() {
 		return userMap;
 	}
 
-	ExecutorService getPool() {
+	public ExecutorService getPool() {
 		return pool;
 	}
 

@@ -9,7 +9,7 @@
         <dependency>
             <groupId>com.mengcraft</groupId>
             <artifactId>simpleorm</artifactId>
-            <version>0.1.7</version>
+            <version>0.1.11</version>
         </dependency>
         <dependency>
             <groupId>org.bukkit</groupId>
