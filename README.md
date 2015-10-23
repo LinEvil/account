@@ -29,6 +29,9 @@
 图样，说了关联dz论坛阿。
 
 ## Session
+以会话的形式管理用户登陆。会话应该在玩家登陆之前请求服务器取得，
+在玩家登陆之后以PluginChannel形式交服务器校验。
+
 ### Structure
 - X as int value
 - Y as int value
