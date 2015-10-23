@@ -28,5 +28,13 @@
 有些同鞋可能会问阿，怎么不支持改密阿，怎么怎么不支持找回阿。
 图样，说了关联dz论坛阿。
 
+## Session
+### Protocol
+Id | Description       | Format
+---|-------------------|---------------
+0  | Session request.  | User, Pass
+1  | Session response. | Session
+2  | Session check.    | Session
+
 ## License
 本插件源代码及其二进制文件以GPLv2发布，请使用者遵守该协议。

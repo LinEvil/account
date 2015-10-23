@@ -3,6 +3,8 @@ package com.mengcraft.account;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import com.mengcraft.account.Account;
+import com.mengcraft.account.Main;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
