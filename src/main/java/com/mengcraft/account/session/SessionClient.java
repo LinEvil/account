@@ -106,7 +106,7 @@ public class SessionClient {
 
                 SessionServer.CACHED_MAP.put(name, session);
 
-                buffer.flip();
+                buffer.clear();
 
                 buffer.putInt(byteBuffer.size());
                 buffer.put(byteBuffer.toByteArray());
