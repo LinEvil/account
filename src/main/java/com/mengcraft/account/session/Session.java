@@ -34,16 +34,6 @@ public class Session {
         return outdated > currentTimeMillis();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return this == o || !(o == null || getClass() != o.getClass()) && hashCode() == o.hashCode();
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * (31 * x + y) + z;
-    }
-
     public int getX() {
         return x;
     }
@@ -54,6 +44,19 @@ public class Session {
 
     public int getZ() {
         return z;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * (31 * x + y) + z;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Session session = (Session) o;
+        return x == session.x && y == session.y && z == session.z;
     }
 
 }
