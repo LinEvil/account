@@ -1,41 +1,33 @@
 package com.mengcraft.account;
 
+import com.mengcraft.account.entity.Event;
+import com.mengcraft.account.entity.User;
+import com.mengcraft.account.lib.ArrayVector;
+import com.mengcraft.account.lib.SecureUtil;
+import com.mengcraft.account.lib.StringUtil;
+import com.mengcraft.simpleorm.EbeanHandler;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
+
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-import com.mengcraft.account.Account;
-import com.mengcraft.account.Main;
-import com.mengcraft.account.entity.Event;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.scheduler.BukkitScheduler;
-
-import com.mengcraft.account.entity.User;
-import com.mengcraft.account.lib.ArrayVector;
-import com.mengcraft.account.lib.SecureUtil;
-import com.mengcraft.account.lib.StringUtil;
-import com.mengcraft.simpleorm.EbeanHandler;
-
-public class Executor implements Listener, Runnable {
+public class Executor implements Listener {
 
     private final Map stateMap = new ConcurrentHashMap();
     private final Object object = new Object();
@@ -47,6 +39,7 @@ public class Executor implements Listener, Runnable {
     private EbeanHandler source;
 
     private String[] contents;
+    private int castInterval;
 
     public void bind(Main main, EbeanHandler source) {
         if (getMain() != main) {
@@ -55,19 +48,32 @@ public class Executor implements Listener, Runnable {
             getMain().getServer()
                     .getPluginManager()
                     .registerEvents(this, main);
-            getMain().getServer()
-                    .getScheduler()
-                    .runTaskTimer(main, this, 600, 20 * main
-                            .getConfig().getInt("broadcast.interval"));
+            setCastInterval(main.getConfig().getInt("broadcast.interval"));
             setSource(source);
         }
     }
 
-    @Override
-    public void run() {
-        for (Player p : getMain().getServer().getOnlinePlayers()) {
-            if (a(p.getName())) p.sendMessage(contents);
+    public void setCastInterval(int castInterval) {
+        this.castInterval = castInterval;
+    }
+
+    private class MessageHandler extends BukkitRunnable {
+
+        private final Player player;
+        private final String name;
+
+        private MessageHandler(Player player) {
+            this.player = player;
+            this.name = player.getName();
         }
+
+        public void run() {
+            if (player.isOnline() && isLocked(name))
+                player.sendMessage(contents);
+            else
+                cancel(); // Cancel if player exit or unlocked.
+        }
+
     }
 
     @EventHandler
@@ -81,22 +87,28 @@ public class Executor implements Listener, Runnable {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void handle(PlayerLoginEvent event) {
+        if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
+            getStateMap().put(event.getPlayer().getName(), object);
+        }
+    }
+
+    @EventHandler
+    public void handle(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        String userName = player.getName();
-        getStateMap().put(userName, object);
         getTask().runTaskLater(getMain(), () -> {
-            if (player.isOnline() && a(userName)) {
+            if (player.isOnline() && isLocked(player.getName())) {
                 event.getPlayer().kickPlayer(ChatColor.DARK_RED + "未登录");
                 pool.execute(() -> source.save(Event.of(player, Event.LOG_FAILURE)));
             }
         }, 600);
+        new MessageHandler(player).runTaskTimer(main, 0, castInterval);
     }
 
     @EventHandler
     public void handle(PlayerMoveEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             Location from = event.getFrom();
             from.setPitch(event.getTo().getPitch());
             from.setYaw(event.getTo().getYaw());
@@ -107,28 +119,28 @@ public class Executor implements Listener, Runnable {
 
     @EventHandler
     public void handle(PlayerInteractEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(PlayerDropItemEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(PlayerPickupItemEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(InventoryOpenEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
@@ -142,21 +154,21 @@ public class Executor implements Listener, Runnable {
 
     @EventHandler
     public void handle(FoodLevelChangeEvent event) {
-        if (a(event.getEntity().getName())) {
+        if (isLocked(event.getEntity().getName())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(AsyncPlayerChatEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void handle(PlayerCommandPreprocessEvent event) {
-        if (a(event.getPlayer().getName())) {
+        if (isLocked(event.getPlayer().getName())) {
             String[] d = StringUtil.DEF.split(event.getMessage());
             ArrayVector<String> vector = new ArrayVector<>(d);
             String c = vector.next();
@@ -253,14 +265,14 @@ public class Executor implements Listener, Runnable {
     }
 
     private boolean a(Entity entity) {
-        return entity instanceof Player && a(b(entity));
+        return entity instanceof Player && isLocked(b(entity));
     }
 
     private String b(Entity entity) {
         return Player.class.cast(entity).getName();
     }
 
-    private boolean a(String name) {
+    private boolean isLocked(String name) {
         return getStateMap().get(name) != null;
     }
 
