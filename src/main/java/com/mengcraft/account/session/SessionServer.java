@@ -1,7 +1,6 @@
 package com.mengcraft.account.session;
 
 import com.mengcraft.account.Main;
-import com.mengcraft.simpleorm.EbeanHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

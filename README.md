@@ -6,7 +6,7 @@
 下面列出来的是使用该插件的一些前置条件，不满足将无法使用该插件。
 - Java 8
     - 没错只支持Java 8，还有目前内测中的Java 9。
-- SimpleORM v0.1.6
+- SimpleORM v0.1.6(or above)
     - 这是我自己写的一个小东西，很小，在这里下：
     - https://github.com/caoli5288/SimpleORM/releases
 
@@ -28,8 +28,28 @@
 有些同鞋可能会问阿，怎么不支持改密阿，怎么怎么不支持找回阿。
 图样，说了关联dz论坛阿。
 
+## Extra
+插件启动后新建表`app_account_event`用以记录玩家登陆事件。
+
+### Table Structure
+Column | Type     | Description
+-------|----------|--------------
+id     | int      | Primary Key
+player | varchar  | Player's name
+ip     | varchar  | Player's ip
+type   | int      | Event Type
+time   | datetime | Event Time
+
+### Event Type
+Id | Description
+---|-----------------
+0  | Register Succeed
+1  | Register Failed
+2  | Login Succeed
+3  | Login Failed
+
 ## Session
-以会话的形式管理用户登陆。会话应该在玩家登陆之前请求服务器取得，
+支持以会话的形式管理用户登陆。会话应该在玩家登陆之前请求服务器取得，
 在玩家登陆之后以PluginChannel形式交服务器校验。
 
 ### Structure
@@ -39,7 +59,7 @@
 
 ### Protocol
 Id | Description       | Format
----|-------------------|---------------
+---|-------------------|-----------
 0  | Session request.  | User, Pass
 1  | Session response. | Session
 2  | Session check.    | Session
