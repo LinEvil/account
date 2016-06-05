@@ -12,14 +12,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Logger;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 /**
  * Created by on 16-4-14.
  */
-public class ServerMain {
+public class Main {
 
     public static final ExecutorService POOL = newCachedThreadPool();
 

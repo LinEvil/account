@@ -1,0 +1,6 @@
+name: AccountClient
+main: com.mengcraft.account.client.Main
+version: ${project.version}
+author: caoli5288
+
+depend: Account
