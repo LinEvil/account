@@ -1,6 +1,8 @@
 package com.mengcraft.account;
 
 import com.mengcraft.account.lib.ReadWriteUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -12,7 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mengcraft.account.Main.eq;
+import static com.mengcraft.account.bungee.BungeeMain.CHANNEL;
 
 /**
  * Created on 16-2-17.
@@ -20,10 +22,11 @@ import static com.mengcraft.account.Main.eq;
 public class BungeeSupport implements PluginMessageListener {
 
     public static final BungeeSupport INSTANCE = new BungeeSupport();
-    private final Map<String, String> map = new HashMap<>();
 
     private BungeeSupport() {
     }
+
+    private final Map<String, String> map = new HashMap<>();
 
     @Override
     public void onPluginMessageReceived(String tag, Player p, byte[] data) {
@@ -31,14 +34,23 @@ public class BungeeSupport implements PluginMessageListener {
         try {
             byte b = input.readByte();
             if (b == 1) {
-                map.put(input.readUTF(), input.readUTF());
+                String name = input.readUTF();
+                String ip = input.readUTF();
+                map.put(name, ip);
+                OfflinePlayer j = Bukkit.getOfflinePlayer(name);
+                if (ExecutorLocked.INSTANCE.isLocked(j.getUniqueId()) && j.isOnline()) {
+                    Player i = j.getPlayer();
+                    if (Main.eq(ip, i.getAddress().getAddress().getHostAddress())) {
+                        ExecutorLocked.INSTANCE.remove(j.getUniqueId());
+                    }
+                }
             } else if (b == 2) {
                 map.remove(input.readUTF());
             } else {
                 throw new IllegalArgumentException(String.valueOf(b));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
@@ -59,7 +71,5 @@ public class BungeeSupport implements PluginMessageListener {
         }
         p.sendPluginMessage(plugin, CHANNEL, buf.toByteArray());
     }
-
-    public static final String CHANNEL = "AccountBungeeSession";
 
 }
