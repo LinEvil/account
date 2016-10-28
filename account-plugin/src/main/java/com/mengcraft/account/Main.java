@@ -1,12 +1,13 @@
 package com.mengcraft.account;
 
-import com.mengcraft.account.bungee.BungeeMain;
+import com.mengcraft.account.bungee.BungeeMessage;
+import com.mengcraft.account.bungee.BungeeSupport;
 import com.mengcraft.account.command.BindingCommand;
 import com.mengcraft.account.entity.AppAccountBinding;
 import com.mengcraft.account.entity.AppAccountEvent;
-import com.mengcraft.account.entity.User;
-import com.mengcraft.account.lib.Messenger;
-import com.mengcraft.account.lib.MetricsLite;
+import com.mengcraft.account.entity.Member;
+import com.mengcraft.account.util.Messenger;
+import com.mengcraft.account.util.MetricsLite;
 import com.mengcraft.simpleorm.EbeanHandler;
 import com.mengcraft.simpleorm.EbeanManager;
 import org.bukkit.ChatColor;
@@ -15,65 +16,53 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private boolean log;
-    private boolean minimal;
+    private boolean notifyMail;
 
     @Override
     public void onEnable() {
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        saveDefaultConfig();
 
-        EbeanHandler source = EbeanManager.DEFAULT.getHandler(this);
-        if (!source.isInitialized()) {
-            source.define(AppAccountBinding.class);
-            source.define(AppAccountEvent.class);
-            source.define(User.class);
+        EbeanHandler db = EbeanManager.DEFAULT.getHandler(this);
+        if (!db.isInitialized()) {
+            db.define(AppAccountBinding.class);
+            db.define(AppAccountEvent.class);
+            db.define(Member.class);
             try {
-                source.initialize();
+                db.initialize();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        source.install(true);
-        source.reflect();
+        db.install(true);
+        db.reflect();
 
+        Account.INSTANCE.setMain(this);
+        log = getConfig().getBoolean("log");
+        notifyMail = getConfig().getBoolean("notify.mail");
 
-        minimal = getConfig().getBoolean("minimal");
-        Messenger messenger = new Messenger(this);
-        new ExecutorCore(this, messenger).bind();
-        if (!minimal) {
-            log = getConfig().getBoolean("log");
-            new Executor(this, messenger).bind();
-            new ExecutorEvent().bind(this);
-            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMain.CHANNEL, BungeeSupport.INSTANCE);
-            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMain.CHANNEL);
-        }
+        if (!getConfig().getBoolean("minimal")) {
+            new Executor(this, new Messenger(this)).bind();
+            new EventListener().bind(this);
 
-        if (getConfig().getBoolean("binding.command")) {
-            getCommand("binding").setExecutor(new BindingCommand(this));
+            if (getConfig().getBoolean("binding.command")) {
+                getCommand("binding").setExecutor(new BindingCommand(this));
+            }
+
+            getServer().getMessenger().registerIncomingPluginChannel(this, BungeeMessage.CHANNEL, BungeeSupport.INSTANCE);
+            getServer().getMessenger().registerOutgoingPluginChannel(this, BungeeMessage.CHANNEL);
         }
 
         new MetricsLite(this).start();
 
-        getServer().getConsoleSender().sendMessage(new String[]{
+        String[] j = {
                 ChatColor.GREEN + "梦梦家高性能服务器出租店",
                 ChatColor.GREEN + "shop105595113.taobao.com"
-        });
-    }
-
-    public boolean isLog() {
-        return log;
+        };
+        getServer().getConsoleSender().sendMessage(j);
     }
 
     public void execute(Runnable runnable) {
         getServer().getScheduler().runTaskAsynchronously(this, runnable);
-    }
-
-    public static boolean eq(Object i, Object j) {
-        return i == j || (i != null && i.equals(j));
-    }
-
-    public boolean isMinimal() {
-        return minimal;
     }
 
     public void process(Runnable task, int tick) {
@@ -82,6 +71,14 @@ public class Main extends JavaPlugin {
 
     public void process(Runnable task) {
         getServer().getScheduler().runTask(this, task);
+    }
+
+    public boolean notifyMail() {
+        return notifyMail;
+    }
+
+    public boolean isLog() {
+        return log;
     }
 
 }

@@ -1,8 +1,8 @@
 package com.mengcraft.account.client;
 
-import com.mengcraft.account.BungeeSupport;
-import com.mengcraft.account.ExecutorLocked;
-import com.mengcraft.account.lib.Messenger;
+import com.mengcraft.account.LockedList;
+import com.mengcraft.account.bungee.BungeeSupport;
+import com.mengcraft.account.util.Messenger;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -21,7 +21,7 @@ import java.net.URLConnection;
 public class ChannelHandler implements PluginMessageListener {
 
     private final BungeeSupport bungeeSupport = BungeeSupport.INSTANCE;
-    private final ExecutorLocked locked = ExecutorLocked.INSTANCE;
+    private final LockedList locked = LockedList.INSTANCE;
     private Main main;
     private Messenger messenger;
     private String server;
