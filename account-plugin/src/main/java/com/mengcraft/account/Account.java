@@ -1,38 +1,79 @@
 package com.mengcraft.account;
 
-import com.mengcraft.account.entity.User;
+import com.mengcraft.account.entity.Member;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.mengcraft.account.util.Util.eq;
+
 public class Account {
 
-    public static final Account DEFAULT = new Account();
+    public static final Account INSTANCE = new Account();
 
-    private final Map<String, User> userMap;
+    private final Map<String, Member> handle;
+    private Main main;
 
     private Account() {
-        this.userMap = new ConcurrentHashMap<>();
+        this.handle = new ConcurrentHashMap<>();
     }
 
-    public Map<String, User> getUserMap() {
-        return userMap;
+    public int getMemberKey(String name) {
+        return getMember(name).getUid();
     }
 
-    public int getUserKey(String name) {
-        return a(userMap.get(name));
+    public int getMemberKey(Player p) {
+        return getMemberKey(p.getName());
     }
 
-    public int getUserKey(Player player) {
-        return a(userMap.get(player.getName()));
+    void drop(String name) {
+        handle.remove(name);
     }
 
-    private int a(User user) {
-        return user != null ? user.getUid() : 0;
+    public Member getMember(String name) {
+        Member j = handle.get(name);
+        if (eq(j, null)) {
+            j = fetch(name);
+            handle.put(name, j);
+        }
+        return j;
     }
 
-    public User getUser(Player p) {
-        return userMap.get(p.getName());
+    private Member fetch(String name) {
+        Member member = main.getDatabase().find(Member.class)
+                .where()
+                .eq("username", name)
+                .findUnique();
+        if (eq(member, null)) {
+            member = new Member();
+        }
+        return member;
     }
+
+    public boolean memberFetched(String name) {
+        return handle.containsKey(name);
+    }
+
+    public boolean memberFetched(Player p) {
+        return handle.containsKey(p.getName());
+    }
+
+    public boolean memberBinding(Player p) {
+        return memberBinding(p.getName());
+    }
+
+    public boolean memberBinding(String name) {
+        Member member = getMember(name);
+        return member != null && member.getBinding() != null;
+    }
+
+    public Member getMember(Player p) {
+        return getMember(p.getName());
+    }
+
+    public void setMain(Main main) {
+        this.main = main;
+    }
+
 }

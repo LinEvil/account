@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import java.util.UUID;
 
 /**
  * Created on 16-4-13.
@@ -18,9 +19,12 @@ public class AppAccountBinding {
     @Column(unique = true)
     private String binding;
 
+    @Column(unique = true, nullable = false)
+    private UUID bindingId;
+
     @JoinColumn(name = "uid")
     @OneToOne
-    private User user;
+    private Member member;
 
     public int getUid() {
         return uid;
@@ -38,12 +42,20 @@ public class AppAccountBinding {
         this.binding = binding;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getBindingId() {
+        return bindingId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setBindingId(UUID bindingId) {
+        this.bindingId = bindingId;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 
 }

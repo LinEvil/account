@@ -1,7 +1,6 @@
 package com.mengcraft.account.entity;
 
-import com.avaje.ebean.EbeanServer;
-import com.mengcraft.account.lib.SecureUtil;
+import com.mengcraft.account.util.SecureUtil;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "pre_ucenter_members")
-public class User {
+public class Member {
 
     @Id
     private int uid;
@@ -23,14 +22,8 @@ public class User {
     @Column(length = 32)
     private String password;
 
-    @Column(length = 32)
+    @Column(length = 32, nullable = false)
     private String email;
-
-    @Column(length = 30)
-    private String myid;
-
-    @Column(length = 16)
-    private String myidkey;
 
     @Column(length = 15)
     private String regip;
@@ -38,19 +31,10 @@ public class User {
     @Column
     private int regdate;
 
-    @Column
-    private int lastloginip;
-
-    @Column
-    private int lastlogintime;
-
     @Column(length = 6)
     private String salt;
 
-    @Column(length = 8)
-    private String secques;
-
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "member")
     private AppAccountBinding binding;
 
     public int getUid() {
@@ -133,30 +117,6 @@ public class User {
         this.regdate = regdate;
     }
 
-    public int getLastloginip() {
-        return lastloginip;
-    }
-
-    public void setLastloginip(int lastloginip) {
-        this.lastloginip = lastloginip;
-    }
-
-    public int getLastlogintime() {
-        return lastlogintime;
-    }
-
-    public void setLastlogintime(int lastlogintime) {
-        this.lastlogintime = lastlogintime;
-    }
-
-    public String getSecques() {
-        return secques;
-    }
-
-    public void setSecques(String secques) {
-        this.secques = secques;
-    }
-
     public AppAccountBinding getBinding() {
         return binding;
     }
@@ -165,39 +125,12 @@ public class User {
         this.binding = binding;
     }
 
-    public void initBinding(EbeanServer db) {
-        if (getBinding() != null) {
-            throw new UnsupportedOperationException("initBinding");
-        }
-        setBinding(db.createEntityBean(AppAccountBinding.class));
-    }
-
-    public boolean isAccountBinding() {
-        return getBinding() != null && getBinding().getBinding() != null;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getMyid() {
-        return myid;
-    }
-
-    public void setMyid(String myid) {
-        this.myid = myid;
-    }
-
-    public String getMyidkey() {
-        return myidkey;
-    }
-
-    public void setMyidkey(String myidkey) {
-        this.myidkey = myidkey;
     }
 
 }
